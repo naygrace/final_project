@@ -7,7 +7,8 @@ library(ggforce)
 data1 <- read_csv("tract_outcomes_simple.csv")
 
 data1 %>%
-    group_by(state) 
+    group_by(state)
+    
    
               
 
@@ -39,7 +40,7 @@ ui <- navbarPage(
              h3("Project Background and Motivations"),
              p("Hello, this is where I talk about my project."),
              h3("Dataset 1"), 
-             p(a("Data1", href = "https://opportunityinsights.org/data/"), "This first dataset shows the imprisonment rates of counties in all fifty states by gender and race.  I plan on also using education data from the same site to find coorelation between access to education and imprisonment rates in different states by race. "),
+             p(a("Data1", href = "https://opportunityinsights.org/data/"), "This first dataset shows the imprisonment rates of counties in all fifty states by gender and race.  I plan on also using education data from the same site to find coorelations between access to education and imprisonment rates in different states by race. "),
              h3("About Me"),
              p("My name is Naomi-Grace and I study Government. 
              You can reach me at naomigracejennings@college.harvard.edu.")))

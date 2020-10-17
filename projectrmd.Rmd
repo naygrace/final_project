@@ -1,0 +1,24 @@
+---
+title: "final_project"
+author: "Naomi-Grace Jennings"
+date: "10/16/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+
+```
+
+## R Markdown
+
+```{r}
+data1 <- read_csv("final_project/tract_outcomes_simple.csv")
+
+data1 %>%
+  group_by(state, .group = "drop") %>%
+  ggplot(aes( x = state, y = jail_black_pooled_p25_se, color = state)) +
+    geom_col()
+```
+
