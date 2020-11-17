@@ -13,12 +13,20 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## R Markdown
 
-```{r}
-data1 <- read_csv("final_project/tract_outcomes_simple.csv")
 
-data1 %>%
-  group_by(state, .group = "drop") %>%
-  ggplot(aes( x = state, y = jail_black_pooled_p25_se, color = state)) +
-    geom_col()
+
+
+
+
+
+```{r}
+ data1 <- read_csv("final_project/tract_outcomes_simple.csv")
+ 
+ data1 %>%
+   group_by(state, .group = "drop") %>%
+   select(czname, jail_pooled_female_p25, jail_black_pooled_p25_se) %>%
+   ggplot(aes( x = state, y = jail_black_pooled_p25_se, fill = state)) +
+     geom_col() +
+   labs(title = "")
 ```
 

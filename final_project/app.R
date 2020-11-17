@@ -7,7 +7,9 @@ library(ggforce)
 data1 <- read_csv("tract_outcomes_simple.csv")
 
 data1 %>%
-    group_by(state)
+    group_by(state) 
+    
+
     
    
               
@@ -43,7 +45,10 @@ ui <- navbarPage(
              p(a("Data1", href = "https://opportunityinsights.org/data/"), "This first dataset shows the imprisonment rates of counties in all fifty states by gender and race.  I plan on also using education data from the same site to find coorelations between access to education and imprisonment rates in different states by race. "),
              h3("About Me"),
              p("My name is Naomi-Grace and I study Government. 
-             You can reach me at naomigracejennings@college.harvard.edu.")))
+             You can reach me at naomigracejennings@college.harvard.edu.")), 
+             h3("Next Steps"), 
+             p("I am working on webscraping now to find the lyrics for my songs for my changed topic"))
+
 
 
 # Define server logic required to draw a histogram
@@ -57,8 +62,9 @@ server <- function(input, output, session) {
     })
     
     output$plot <- renderPlot({
-        ggplot(data1, aes(.data[[input$x]], .data[[input$y]], color = state)) +
-            plot_geom()
+        ggplot(data1, aes(.data[[input$x]], .data[[input$y]], fill = state)) +
+            plot_geom() +
+            theme_dark()
     }, res = 96)
 }
 
