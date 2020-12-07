@@ -42,7 +42,7 @@ ui <- navbarPage(theme = shinytheme("slate"),
                   
                      checkboxInput("x", "Artist", c("grandmaster_caz", "grandmaster_melle_mel", "kurtis_blow", "kool_moe_dee", "spoonie_gee", "jimmy_spicer",  "run_dmc", "ll_cool_j", "roxanne_shante", "slick_rick", "beastie_boys",  "krsone", "too_short", "schoolly_d", "ice_cube", "chuck_d", "grand_puba", "kool_g_rap", "big_daddy_kane", "nwa", "method_man",  "scarface", "dres", "redman", "nas", "notorious_big", "2pac", "raekwon", "prodigy", "busta_rhymes", "twista", "dmx", "jayz", "big_pun", "lauryn_hill", "eminem", "ghostface_killah", "ludacris", "jadakiss", "dr_dre", "50_cent", "common", "ti",  "lil_wayne", "gucci_mane", "rick_ross",  "kanye_west","drake", "nicki_minaj")),
                      selectInput("geom", "geom", c("point", "column")),
-                     plotOutput("plot2"))),
+                     plotOutput("plot"))),
              
     tabPanel("Misogynystic Word Usage Over the Years",
              fluidPage(
