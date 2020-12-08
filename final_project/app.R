@@ -11,7 +11,10 @@ library(glue)
 library(tidytext)
 library(shinyWidgets)
 library(shinythemes)
-
+library(rstanarm)
+library(rsconnect)
+library(gt)
+library(gtsummary)
 
 
 
@@ -117,22 +120,67 @@ server = function(input, output) {
     
     
     output$plot3 <- renderPlot({
-        avg_words_model
+        #avg_words_model
+        complete_data %>%
+            
+            #select(artist, words, title) %>%
+            group_by(artist, title) %>%
+            
+            mutate(bitch = sum(str_count(words, "bitch")),
+                   hoe = sum(str_count(words, "hoe")), 
+                   slut = sum(str_count(words, "slut")),
+                   whore = sum(str_count(words, "whore")), 
+                   tease = sum(str_count(words, "tease")), 
+                   trick = sum(str_count(words, "trick")),
+                   gold_digger = sum(str_count(words, "gold digger"))) %>%
+            
+            #maybe group by title here again then summarise so all the zero rows don't show up...?? Looks messy 
+            
+            mutate(sumrow = bitch + hoe + slut + whore + tease + trick + gold_digger) %>%
+            group_by(artist) %>%
+            summarise(avg_count = mean(sumrow)) %>%
+            
+            
+            ggplot(aes(x = factor(artist, level = c("grandmaster_caz", "grandmaster_melle_mel", "kurtis_blow", "kool_moe_dee", "spoonie_gee", "jimmy_spicer",  "run_dmc", "ll_cool_j", "roxanne_shante", "slick_rick", "beastie_boys", "lil_boosie",  "krsone", "too_short", "schoolly_d", "ice_cube", "chuck_d", "grand_puba", "kool_g_rap", "big_daddy_kane", "nwa", "method_man",  "scarface", "dres", "redman", "nas", "notorious_big", "2pac", "raekwon", "prodigy", "busta_rhymes", "twista", "dmx", "jayz", "2_live_crew", "big_pun", "lauryn_hill", "eminem", "ghostface_killah", "ludacris", "jadakiss", "korn", "dr_dre", "50_cent", "common", "killer_mike", "ti",  "lil_wayne", "gucci_mane", "rick_ross",  "kanye_west","drake", "nicki_minaj")), y = avg_count)) +
+            geom_col(aes(stat = "identity", position = "stack"), color = "skyblue", fill = "darkblue") +
+            labs(title = "Misogynistic Terms in Popular Rap", subtitle = "Average number of misogynistic terms used per song by the popular rappers from 1979-2016 ", x = "Artist", y = "Average Number of Terms per Song") +
+            theme(axis.text.x = element_text(angle = 90)) +
+            scale_x_discrete(labels = c("Grandmaster Caz", "Grandmaster Melle Mel", "Kurtis Blow", "Kool Moe Dee", "Spoonie Gee", "Jimmy Spicer",  "Run-DMC", "LL Cool J", "Roxanne Shante", "Slick Rick", "Beastie Boys", "Lil Boosie",  "KRS-One", "Too $hort", "Schoolly D", "Ice Cube", "Chuck D", "Grand Puba", "Kool G Rap", "Big Daddy Kane", "NWA", "Method Man",  "Scarface", "Dres", "Redman", "Nas", "Notorious B.I.G.", "2Pac", "Raekwon", "Prodigy", "Busta Rhymes", "Twista", "DMX", "Jay-Z", "2 Live Crew", "Big Pun", "Lauryn Hill", "Eminem", "Ghostface Killah", "Ludacris", "Jadakiss", "Korn", "D. Dre", "50 Cent", "Common", "Killer Mike", "T.I.",  "Lil Wayne", "Gucci Mane", "Rick Ross",  "Kanye West","Drake", "Nicki Minaj")) +
+            theme_clean() +
+            theme(axis.text.x = element_text(angle = 90)) 
         
     }, res = 96)
     
     
     output$plot4 <- renderPlot({
+        complete_data %>%
+            
+            #select(artist, words, title) %>%
+            group_by(artist, title) %>%
+            
+            mutate(bitch = sum(str_count(words, "bitch")),
+                   hoe = sum(str_count(words, "hoe")), 
+                   slut = sum(str_count(words, "slut")),
+                   whore = sum(str_count(words, "whore")), 
+                   tease = sum(str_count(words, "tease")), 
+                   trick = sum(str_count(words, "trick")),
+                   gold_digger = sum(str_count(words, "gold digger"))) %>%
+            
+            #maybe group by title here again then summarise so all the zero rows don't show up...?? Looks messy 
+            
+            mutate(sumrow = bitch + hoe + slut + whore + tease + trick + gold_digger) %>%
         
-        avg_words %>%
+        
+
+       #  avg_words %>%
             filter(artist == input$x2) %>%
-            group_by(title) %>%
-        
-       ggplot(aes(x = title, y = sumrow)) +
-            geom_col(aes(stat = "identity", position = "stack"), color = "skyblue", fill = "darkblue") +
-            labs(title = "Misogynistic Term Count by Artist", subtitle = "Per song", x = "Artist", y = "Word Count") +
-            theme(axis.text.x = element_text(angle = 90)) +
-            theme_clean() +
+             group_by(title) %>%
+         
+        ggplot(aes(x = title, y = sumrow)) +
+             geom_col(aes(stat = "identity", position = "stack"), color = "skyblue", fill = "darkblue") +
+         labs(title = "Misogynistic Term Count by Artist", subtitle = "Per song", x = "Artist", y = "Word Count") +
+             theme(axis.text.x = element_text(angle = 90)) +
+             theme_clean() +
             
     #This looks a hot mess with all the titles so just take them all off
             
@@ -144,29 +192,37 @@ server = function(input, output) {
     
     
     output$plot5 <- renderPlot({
-        
+        ggplot(big, aes(x = Year, y = sentiment_score)) +
+            geom_point(color = "steelblue", alpha = .5, size = 1.5, position = position_jitter(width = .5, height = .5)) +
+            labs(title = "Misogynistic Sentiment Rating and Year", x = "Year", y = "Rating") +
+            theme_clean()
+        #geom_abline(intercept = 2.64646, slope =   -0.00104  , color = "darkblue")
+        #This is just not cute but uses the coefficients from stan_glm() fit 
 #Very poor just poor do better 
         
-        regression_model
+        #regression_model
     }, res = 96)
     
     
     output$plot6 <- renderPlot({
+        new_scores %>%
+            
+            ggplot(aes(x = factor(artist, level = c("grandmaster_caz", "grandmaster_melle_mel", "kurtis_blow", "kool_moe_dee", "spoonie_gee", "jimmy_spicer",  "run_dmc", "ll_cool_j", "roxanne_shante", "slick_rick", "beastie_boys",  "krsone", "too_short", "schoolly_d", "ice_cube", "chuck_d", "grand_puba", "kool_g_rap", "big_daddy_kane", "nwa", "method_man",  "scarface", "dres", "redman", "nas", "notorious_big", "2pac", "raekwon", "prodigy", "busta_rhymes", "twista", "dmx", "jayz", "big_pun", "lauryn_hill", "eminem", "ghostface_killah", "ludacris", "jadakiss", "dr_dre", "50_cent", "common", "ti",  "lil_wayne", "gucci_mane", "rick_ross",  "kanye_west","drake", "nicki_minaj")), y = score)) +
+            # geom_line(aes(group = 1)) +
+            geom_col(color = "darkblue", fill = "steelblue") +
         
-        new_scores_model2
+            
+            scale_x_discrete(labels = c("Grandmaster Caz", "Grandmaster Melle Mel", "Kurtis Blow", "Kool Moe Dee", "Spoonie Gee", "Jimmy Spicer",  "Run-DMC", "LL Cool J", "Roxanne Shante", "Slick Rick", "Beastie Boys", "Lil Boosie",  "KRS-One", "Too $hort", "Schoolly D", "Ice Cube", "Chuck D", "Grand Puba", "Kool G Rap", "Big Daddy Kane", "NWA", "Method Man",  "Scarface", "Dres", "Redman", "Nas", "Notorious B.I.G.", "2Pac", "Raekwon", "Prodigy", "Busta Rhymes", "Twista", "DMX", "Jay-Z", "2 Live Crew", "Big Pun", "Lauryn Hill", "Eminem", "Ghostface Killah", "Ludacris", "Jadakiss", "Korn", "D. Dre", "50 Cent", "Common", "Killer Mike", "T.I.",  "Lil Wayne", "Gucci Mane", "Rick Ross",  "Kanye West","Drake", "Nicki Minaj")) +
+            theme(axis.text.x = element_text(angle = 90)) %>%
+            labs(title = "Misogynistic Sentiment Ratings", subtitle = "For Artists from 1979-2016", x = "Artist", y = "Rating") +
+            
+            theme_clean() +
+            theme(axis.text.x = element_text(angle = 90)) 
+        #new_scores_model2
     }, res = 96)
 
 } 
-#     
-#     output$plot <- renderPlot({
-#         ggplot(scores, aes(.data[[input$x]], .data[[input$y]], fill = artist)) +
-#             plot_geom() +
-#             theme_dark()
-#     }, res = 96)
-# }
 
-
-#c("grandmaster_caz", "grandmaster_melle_mel", "kurtis_blow", "kool_moe_dee", "spoonie_gee", "jimmy_spicer",  "run_dmc", "ll_cool_j", "roxanne_shante", "slick_rick", "beastie_boys",  "krsone", "too_short", "schoolly_d", "ice_cube", "chuck_d", "grand_puba", "kool_g_rap", "big_daddy_kane", "nwa", "method_man",  "scarface", "dres", "redman", "nas", "notorious_big", "2pac", "raekwon", "prodigy", "busta_rhymes", "twista", "dmx", "jayz", "big_pun", "lauryn_hill", "eminem", "ghostface_killah", "ludacris", "jadakiss", "dr_dre", "50_cent", "common", "ti",  "lil_wayne", "gucci_mane", "rick_ross",  "kanye_west","drake", "nicki_minaj")),
 
 
 # Run the application 
