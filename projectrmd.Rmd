@@ -19,71 +19,35 @@ library(tidytext)
 library(rstanarm)
 ```
 
-
+Artist  g1
 ```{r}
-# em <- read_html("https://www.allthelyrics.com/lyrics/eminem/lose_yourself-lyrics-10632.html")
-# 
-# 
-# em_title <- em %>%   #Song title 
-#   html_nodes(".page-title") %>%
-#   html_text()
-# 
-# em_lyrics <- em %>%   #Song lyrics 
-#    html_nodes(".content-text-inner") %>%
-#   html_text()
-# 
-# em.all <- read_html("https://www.allthelyrics.com/lyrics/eminem")
-# 
-# em_raps <- em.all %>%  #List of all song titles 
-#   html_nodes(".lyrics-list-item") %>%
-#   # html_attr("href")
-#   html_text()
-# 
-# #em_raps #List of all song titles 
-# 
-# 
-# urls <- em.all %>%  
-#    
-#   html_nodes("a") %>%
-#   html_attr("href") 
-#   
 
-#urls # #All urls on page--find way to drop ones that aren't the songs 
+#Creating a list item of artists I want to use 
+#Used web developer tools to find correct artist name
 
-
-
-
- #This is what I'm tryign rn
-
-# lyrics <- urls %>%
-#    as_tibble() %>%
-#    slice(39:503) %>%
-#    summarise(urls = read_html() %>%
-#              html_nodes(".context-text-inner") %>%
-#              html_text())
-
-
-```
-
-
-```{r}
 artists1 <- c("kurtis_blow", "grandmaster_melle_mel", "run_dmc", "ll_cool_j", "slick_rick", "ice_cube", "nwa", "redman")
+
+#Url list paste0() to add the artist's name from artist1 list above
 
 artist_urls <- paste0("https://www.allthelyrics.com/lyrics/", artists1)
 
+
 finaldata1 <- c() #setting up an empty dataset for the end
 
+#Webscraper: goes through each url pasted above 
 
 for (j in 1:length(artist_urls)) {
   
   all <- read_html(artist_urls[j])
   
+  
+ # lyrics  for each url under each artist   
   raps <- all %>%
     html_nodes(".lyrics-list-item") %>%
     # html_attr("href")
     html_text()
   
-  raps # Here are the raps
+  raps # Here are the lyrics for each song
   
   
   urls <- all %>%
@@ -126,6 +90,8 @@ View(finaldata1)
 write.csv(finaldata1, "finaldata.csv")
 ```
 
+
+Artists g2
 ```{r}
 artists2 <- c("nas", "notorious_big", "2pac", "dmx", "jayz", "eminem", "50_cent", "ti") 
 
@@ -186,6 +152,8 @@ View(finaldata2)
 write.csv(finaldata2, "finaldata.csv")
 ```
 
+
+Artists g3
 ```{r}
 artists3 <- c("too_short", "lil_wayne", "kanye_west","drake", "nicki_minaj")
 #, "youngboy_never_broke_again", "snoop_dog", "j._cole")
@@ -254,281 +222,7 @@ write.csv(finaldata3, "finaldata.csv")
 
 ```
 
-
-
-```{r}
-#Counting words
-
-complete_data <- rbind(finaldata1, finaldata2, finaldata3, finaldata4, finaldata5, finaldata6, finaldata7, finaldata8)
-write.csv(complete_data, "complete_data.csv")
-
- 
-
-  colnames(complete_data) <- c("webpage", "artist", "title", "words")
-```
-
-Average number of misogynistic terms per song for each artist 
-```{r}
-scores <- complete_data %>%
-  
-  #select(artist, words, title) %>%
-  group_by(artist, title) %>%
-    
- mutate(bitch = sum(str_count(words, "bitch")),
-           hoe = sum(str_count(words, "hoe")), 
-           slut = sum(str_count(words, "slut")),
-           whore = sum(str_count(words, "whore")), 
-           tease = sum(str_count(words, "tease")), 
-           trick = sum(str_count(words, "trick")),
-           gold_digger = sum(str_count(words, "gold digger"))) %>%
-  mutate(sumrow = bitch + hoe + slut + whore + tease + trick + gold_digger)
-        
-
-        
-        
-   scores %>%
-     group_by(artist) %>%
-     summarise(me = mean(sumrow)) %>%
-     
-   
-   ggplot(aes(x = factor(artist, level = c("grandmaster_caz", "grandmaster_melle_mel", "kurtis_blow", "kool_moe_dee", "spoonie_gee", "jimmy_spicer",  "run_dmc", "ll_cool_j", "roxanne_shante", "slick_rick", "beastie_boys", "lil_boosie",  "krsone", "too_short", "schoolly_d", "ice_cube", "chuck_d", "grand_puba", "kool_g_rap", "big_daddy_kane", "nwa", "method_man",  "scarface", "dres", "redman", "nas", "notorious_big", "2pac", "raekwon", "prodigy", "busta_rhymes", "twista", "dmx", "jayz", "2_live_crew", "big_pun", "lauryn_hill", "eminem", "ghostface_killah", "ludacris", "jadakiss", "korn", "dr_dre", "50_cent", "common", "killer_mike", "ti",  "lil_wayne", "gucci_mane", "rick_ross",  "kanye_west","drake", "nicki_minaj")), y = me)) +
-  geom_col(aes(stat = "identity", position = "stack"), color = "skyblue", fill = "darkblue") +
-   labs(title = "Average Usage of Misogynistic Words by Popular Rappers Over the Last 40 Years", subtitle = "Words used by the most popular rap artist of the year", x = "Artist", y = "Average Number of Terms per Song") +
-   theme(axis.text.x = element_text(angle = 90)) +
-     scale_x_discrete(labels = c("Grandmaster Caz", "Grandmaster Melle Mel", "Kurtis Blow", "Kool Moe Dee", "Spoonie Gee", "Jimmy Spicer",  "Run-DMC", "LL Cool J", "Roxanne Shante", "Slick Rick", "Beastie Boys", "Lil Boosie",  "KRS-One", "Too $hort", "Schoolly D", "Ice Cube", "Chuck D", "Grand Puba", "Kool G Rap", "Big Daddy Kane", "NWA", "Method Man",  "Scarface", "Dres", "Redman", "Nas", "Notorious B.I.G.", "2Pac", "Raekwon", "Prodigy", "Busta Rhymes", "Twista", "DMX", "Jay-Z", "2 Live Crew", "Big Pun", "Lauryn Hill", "Eminem", "Ghostface Killah", "Ludacris", "Jadakiss", "Korn", "D. Dre", "50 Cent", "Common", "Killer Mike", "T.I.",  "Lil Wayne", "Gucci Mane", "Rick Ross",  "Kanye West","Drake", "Nicki Minaj")) +
-     theme_clean() +
-     theme(axis.text.x = element_text(angle = 90)) 
-   
-
-```
-
-Total word count per artist model 
-```{r}
-total_count <- complete_data %>%
-  
-  #select(artist, words, title) %>%
-  group_by(artist, title) %>%
-    
- mutate(bitch = sum(str_count(words, "bitch")),
-           hoe = sum(str_count(words, "hoe")), 
-           slut = sum(str_count(words, "slut")),
-           whore = sum(str_count(words, "whore")), 
-           tease = sum(str_count(words, "tease")), 
-           trick = sum(str_count(words, "trick")),
-           gold_digger = sum(str_count(words, "gold digger"))) %>%
-  mutate(sumrow = bitch + hoe + slut + whore + tease + trick + gold_digger) %>%
-
-ggplot(aes(x = factor(artist, level = c("grandmaster_caz", "grandmaster_melle_mel", "kurtis_blow", "kool_moe_dee", "spoonie_gee", "jimmy_spicer",  "run_dmc", "ll_cool_j", "roxanne_shante", "slick_rick", "beastie_boys", "lil_boosie",  "krsone", "too_short", "schoolly_d", "ice_cube", "chuck_d", "grand_puba", "kool_g_rap", "big_daddy_kane", "nwa", "method_man",  "scarface", "dres", "redman", "nas", "notorious_big", "2pac", "raekwon", "prodigy", "busta_rhymes", "twista", "dmx", "jayz", "2_live_crew", "big_pun", "lauryn_hill", "eminem", "ghostface_killah", "ludacris", "jadakiss", "korn", "dr_dre", "50_cent", "common", "killer_mike", "ti",  "lil_wayne", "gucci_mane", "rick_ross",  "kanye_west","drake", "nicki_minaj")), y = sumrow)) +
-  geom_col( color = "darkblue", fill = "darkblue", color = "skyblue") +
-   labs(title = "Misogynistic Words used by Popular Rappers", subtitle = "From 1979-2016",  x = "Artist", y = "Total Word Count") +
-   
-     scale_x_discrete(labels = c("Grandmaster Caz", "Grandmaster Melle Mel", "Kurtis Blow", "Kool Moe Dee", "Spoonie Gee", "Jimmy Spicer",  "Run-DMC", "LL Cool J", "Roxanne Shante", "Slick Rick", "Beastie Boys", "Lil Boosie",  "KRS-One", "Too $hort", "Schoolly D", "Ice Cube", "Chuck D", "Grand Puba", "Kool G Rap", "Big Daddy Kane", "NWA", "Method Man",  "Scarface", "Dres", "Redman", "Nas", "Notorious B.I.G.", "2Pac", "Raekwon", "Prodigy", "Busta Rhymes", "Twista", "DMX", "Jay-Z", "2 Live Crew", "Big Pun", "Lauryn Hill", "Eminem", "Ghostface Killah", "Ludacris", "Jadakiss", "Korn", "D. Dre", "50 Cent", "Common", "Killer Mike", "T.I.",  "Lil Wayne", "Gucci Mane", "Rick Ross",  "Kanye West","Drake", "Nicki Minaj")) +
-  theme_clean() +
-theme(axis.text.x = element_text(angle = 90)) 
-        
-total_count
-        
-```
-
-
-
-
-
-
-
-
-"grandmaster_caz", "grandmaster_melle_mel", "kurtis_blow", "kool_moe_dee", "spoonie_gee", "jimmy_spicer",  "run_dmc", "ll_cool_j", "roxanne_shante", "slick_rick", "beastie_boys", "lil_boosie",  "krsone", "too_short", "schoolly_d", "ice_cube", "chuck_d", "grand_puba", "kool_g_rap", "big_daddy_kane", "nwa", "method_man",  "scarface", "dres", "redman", "nas", "notorious_big", "2pac", "raekwon", "prodigy", "busta_rhymes", "twista", "dmx", "jayz", "2_live_crew", "big_pun", "lauryn_hill", "eminem", "ghostface_killah", "ludacris", "jadakiss", "korn", "dr_dre", "50_cent", "common", "killer_mike", "ti",  "lil_wayne", "gucci_mane", "rick_ross",  "kanye_west","drake", "nicki_minaj"    
-      
-
-Song Sentiment distribution for an individual artist (Too $hort)
-```{r}
-#Sentiments for too short
-# too_short <- complete_data %>%
-#   filter(Artist == "too_short") %>%
-#   select(words, Artist, titles)
-# 
-#  too_short_sentiments <- sentiment_by(too_short$words,
-#  averaging.function = sentimentr::average_downweighted_zero) %>%
-#     mutate(total = sum(ave_sentiment)) 
- 
- too_short_sentiments <- complete_data %>%
-   filter(artist == "too_short") %>%
-  select(words, artist, title) %>%
-   group_by(title) %>%
-   get_sentences() %>%
-   
- 
-sentiment_by(too_short_sentiments$words, by = "title",  
- averaging.function = sentimentr::average_mean) %>%
-   group_by(title)
-
-#modeling one artists sentiments each song 
-too_short_sentiments %>%
-  select(title, ave_sentiment) %>%
-  group_by(title) %>%
-  summarise(mean = mean(ave_sentiment)) %>%
-
-
-  
- 
- ggplot(aes(x = reorder(title, desc(mean)), y = mean)) +
-   geom_col(color = "skyblue", fill = "darkblue") +
-  
-  labs(title = "Too $hort Sentiment Ratings", subtitle = "Sentiment Ratings of Too $hort songs", y = "Average Sentiment Rating for each Too $hort Song", x = "Songs") +
-  theme_clean() +
-theme(axis.text.x = element_blank()) 
-
-too_short_sentiments
-  
-  
-```
-
-
-
-
-whole dataset sentiments 
-```{r}
-sentiments <- complete_data %>%
-   
-  select(words, artist, title) %>%
-   group_by(artist, title) %>%
-   get_sentences() %>%
-   
- 
-sentiment_by(sentiments$words, by = c("artist", "title"),  
- averaging.function = sentimentr::average_mean)
-  
-
-
-
-sentiments %>%
-  
-  group_by(artist) %>%
-  summarise(mean = mean(ave_sentiment)) %>% 
-  
-
-
-
-  
- 
- ggplot(aes(x = factor(artist, level = c("grandmaster_caz", "grandmaster_melle_mel", "kurtis_blow", "kool_moe_dee", "spoonie_gee", "jimmy_spicer",  "run_dmc", "ll_cool_j", "roxanne_shante", "slick_rick", "beastie_boys",  "krsone", "too_short", "schoolly_d", "ice_cube", "chuck_d", "grand_puba", "kool_g_rap", "big_daddy_kane", "nwa", "method_man",  "scarface", "dres", "redman", "nas", "notorious_big", "2pac", "raekwon", "prodigy", "busta_rhymes", "twista", "dmx", "jayz", "big_pun", "lauryn_hill", "eminem", "ghostface_killah", "ludacris", "jadakiss", "dr_dre", "50_cent", "common", "ti",  "lil_wayne", "gucci_mane", "rick_ross",  "kanye_west","drake", "nicki_minaj")), y = mean)) +
-   geom_col(fill = "darkblue", color = "skyblue") +
-  
-  scale_x_discrete(labels = c("Grandmaster Caz", "Grandmaster Melle Mel", "Kurtis Blow", "Kool Moe Dee", "Spoonie Gee", "Jimmy Spicer",  "Run-DMC", "LL Cool J", "Roxanne Shante", "Slick Rick", "Beastie Boys", "Lil Boosie",  "KRS-One", "Too $hort", "Schoolly D", "Ice Cube", "Chuck D", "Grand Puba", "Kool G Rap", "Big Daddy Kane", "NWA", "Method Man",  "Scarface", "Dres", "Redman", "Nas", "Notorious B.I.G.", "2Pac", "Raekwon", "Prodigy", "Busta Rhymes", "Twista", "DMX", "Jay-Z", "2 Live Crew", "Big Pun", "Lauryn Hill", "Eminem", "Ghostface Killah", "Ludacris", "Jadakiss", "Korn", "D. Dre", "50 Cent", "Common", "Killer Mike", "T.I.",  "Lil Wayne", "Gucci Mane", "Rick Ross",  "Kanye West","Drake", "Nicki Minaj")) +
-  labs(title = "Average Sentiment Ratings for Popular Rappers", subtitle = "From 1979-2016", x = "Artist", y = "Average Sentiment Rating") +
-  theme_clean() +
-  theme(axis.text.x = element_text(angle = 90)) 
-  
-   
-#average sentiment for all songs per artist over the years  
-sentiments
-  
-```
-Tryna look at sentiment and words together so making sentiment data not numerical but like negative or postitive only then if its negative/positive/neutral give it a plus/minus point and see where that gets you 
-
-   
-average sentiment for all songs per artist over the years  
-sentiments
-  
-
-Tryna look at sentiment and words together so making sentiment data not numerical but like negative or postitive only then if its negative/positive/neutral give it a plus/minus point and see where that gets you 
-
-```{r}
-sentiments2 <- complete_data %>%
-   select(title, artist, words) %>%
-   group_by(artist) %>%
-   get_sentences() %>%
-   
- 
-sentiment_by(sentiments2$words, by = c("title", "artist"),  
- averaging.function = sentimentr::average_mean) %>%
-   group_by(artist)
-
-new <- merge(sentiments2, scores) %>%
-
-
-  mutate(rah = case_when((ave_sentiment >= 0 & sumrow <= 0) ~ "positive", 
-                        # (ave_sentiment == 0) ~ "neutral", 
-                         (ave_sentiment <= 0 & sumrow >= 0) ~ "negative", 
-                        TRUE ~ "neutral")) %>%
-  
-  mutate(har = case_when(rah == "positive" ~ -1, 
-                   rah == "neutral" ~ 0, 
-                   rah == "negative" ~ 1)) %>%
-  
-  group_by(artist) %>%
-  summarise(sah = sum(har)) 
-
-
-new %>%
-ggplot(aes(x = factor(artist, level = c("grandmaster_caz", "grandmaster_melle_mel", "kurtis_blow", "kool_moe_dee", "spoonie_gee", "jimmy_spicer",  "run_dmc", "ll_cool_j", "roxanne_shante", "slick_rick", "beastie_boys",  "krsone", "too_short", "schoolly_d", "ice_cube", "chuck_d", "grand_puba", "kool_g_rap", "big_daddy_kane", "nwa", "method_man",  "scarface", "dres", "redman", "nas", "notorious_big", "2pac", "raekwon", "prodigy", "busta_rhymes", "twista", "dmx", "jayz", "big_pun", "lauryn_hill", "eminem", "ghostface_killah", "ludacris", "jadakiss", "dr_dre", "50_cent", "common", "ti",  "lil_wayne", "gucci_mane", "rick_ross",  "kanye_west","drake", "nicki_minaj")), y = sah)) +
- # geom_line(aes(group = 1)) +
-  geom_point() +
-  geom_line(aes(group = 1), color = "darkblue") +
-  
-  scale_x_discrete(labels = c("Grandmaster Caz", "Grandmaster Melle Mel", "Kurtis Blow", "Kool Moe Dee", "Spoonie Gee", "Jimmy Spicer",  "Run-DMC", "LL Cool J", "Roxanne Shante", "Slick Rick", "Beastie Boys", "Lil Boosie",  "KRS-One", "Too $hort", "Schoolly D", "Ice Cube", "Chuck D", "Grand Puba", "Kool G Rap", "Big Daddy Kane", "NWA", "Method Man",  "Scarface", "Dres", "Redman", "Nas", "Notorious B.I.G.", "2Pac", "Raekwon", "Prodigy", "Busta Rhymes", "Twista", "DMX", "Jay-Z", "2 Live Crew", "Big Pun", "Lauryn Hill", "Eminem", "Ghostface Killah", "Ludacris", "Jadakiss", "Korn", "D. Dre", "50 Cent", "Common", "Killer Mike", "T.I.",  "Lil Wayne", "Gucci Mane", "Rick Ross",  "Kanye West","Drake", "Nicki Minaj")) +
-  theme(axis.text.x = element_text(angle = 90)) %>%
-  labs(title = "Negative Sentiment Ratings", subtitle = "For Artists between 1979-2016", x = "Artist", y = "Negative Sentiment Rating") +
- 
-  theme_clean() +
-  theme(axis.text.x = element_text(angle = 90)) 
-
-
-
-
-```
-^^^Sentiment over the years model 2??? Compiles words and sentiments 
-
-
-```{r}
-new <- merge(sentiments2, scores) %>%
-
-
-  mutate(rah = case_when((ave_sentiment >= 0 & sumrow <= 0) ~ "positive", 
-                        # (ave_sentiment == 0) ~ "neutral", 
-                         (ave_sentiment <= 0 & sumrow >= 0) ~ "negative", 
-                        TRUE ~ "neutral")) %>%
-  
-  mutate(har = case_when(rah == "positive" ~ 0, 
-                   rah == "neutral" ~ 0, 
-                   rah == "negative" ~ 1)) %>%
-  
-  group_by(artist) %>%
-  summarise(sah = sum(har)) 
-
-
-new %>%
-ggplot(aes(x = factor(artist, level = c("grandmaster_caz", "grandmaster_melle_mel", "kurtis_blow", "kool_moe_dee", "spoonie_gee", "jimmy_spicer",  "run_dmc", "ll_cool_j", "roxanne_shante", "slick_rick", "beastie_boys",  "krsone", "too_short", "schoolly_d", "ice_cube", "chuck_d", "grand_puba", "kool_g_rap", "big_daddy_kane", "nwa", "method_man",  "scarface", "dres", "redman", "nas", "notorious_big", "2pac", "raekwon", "prodigy", "busta_rhymes", "twista", "dmx", "jayz", "big_pun", "lauryn_hill", "eminem", "ghostface_killah", "ludacris", "jadakiss", "dr_dre", "50_cent", "common", "ti",  "lil_wayne", "gucci_mane", "rick_ross",  "kanye_west","drake", "nicki_minaj")), y = sah)) +
-  geom_col(fill = "darkblue", color = "skyblue") + 
-  theme(axis.text.x = element_text(angle = 90)) +
-  scale_x_discrete(labels = c("Grandmaster Caz", "Grandmaster Melle Mel", "Kurtis Blow", "Kool Moe Dee", "Spoonie Gee", "Jimmy Spicer",  "Run-DMC", "LL Cool J", "Roxanne Shante", "Slick Rick", "Beastie Boys", "Lil Boosie",  "KRS-One", "Too $hort", "Schoolly D", "Ice Cube", "Chuck D", "Grand Puba", "Kool G Rap", "Big Daddy Kane", "NWA", "Method Man",  "Scarface", "Dres", "Redman", "Nas", "Notorious B.I.G.", "2Pac", "Raekwon", "Prodigy", "Busta Rhymes", "Twista", "DMX", "Jay-Z", "2 Live Crew", "Big Pun", "Lauryn Hill", "Eminem", "Ghostface Killah", "Ludacris", "Jadakiss", "Korn", "D. Dre", "50 Cent", "Common", "Killer Mike", "T.I.",  "Lil Wayne", "Gucci Mane", "Rick Ross",  "Kanye West","Drake", "Nicki Minaj")) +
-  labs(title = "Negative Sentiment Ratings", subtitle = "For Artists between 1979-2016", x = "Artist", y = "Negative Sentiment Rating") +
-   theme_clean() +
-  theme(axis.text.x = element_text(angle = 90)) 
-
-  
-
-```
-
-
-
-
-
-
-
-
-
-```{r}
- 
-#Net Worth dataframe...where the fuck am I getting this information from?? Readin
-# "grandmaster_caz", "kool_moe_dee", "spoonie_gee", "jimmy_spicer", "roxanne_shante", "beastie_boys", "krsone",   4
-#"schoolly_d", "chuck_d", "big_daddy_kane", "kool_g_rap", "grand_puba", "scarface", "dr_dre", "dres",    5
-#"method_man", "raekwon", "prodigy", "busta_rhymes", "twista", "big_pun", "lauryn_hill", "ghostface_killah",    6
-#"ludacris", "jadakiss", "common", "gucci_mane", "rick_ross",   7
-#"killer_mike", "korn", "2_live_crew", "lil_boosie"    8
-```
-
-Artists 4
+Artists g4
 ```{r}
 
 artists4 <- c("grandmaster_caz", "kool_moe_dee", "spoonie_gee", "jimmy_spicer", "schoolly_d", "roxanne_shante", "beastie_boys", "krsone")
@@ -591,9 +285,7 @@ write.csv(finaldata4, "finaldata4.csv")
 ```
 
 
-
-
-Artists 5
+Artists g5
 ```{r}
 artists5 <- c("schoolly_d", "chuck_d", "big_daddy_kane", "kool_g_rap", "grand_puba", "scarface", "dr_dre", "dres") 
 
@@ -654,7 +346,7 @@ View(finaldata5)
 write.csv(finaldata5, "finaldata5.csv")
 ```
 
-Artists 6 
+Artists g6 
 ```{r}
 artists6 <- c("method_man", "raekwon", "prodigy", "busta_rhymes", "twista", "big_pun", "lauryn_hill", "ghostface_killah") 
 
@@ -716,7 +408,7 @@ write.csv(finaldata6, "finaldata6.csv")
 ```
 
 
-Artists 7 
+Artists g7 
 ```{r}
 artists7 <- c("ludacris", "jadakiss", "common", "gucci_mane", "rick_ross")
 
@@ -778,7 +470,7 @@ write.csv(finaldata7, "finaldata7.csv")
 ```
 
 
-Artists 8 
+Artists g8 
 
 ```{r}
 artists8 <- c("killer_mike", "korn", "2_live_crew", "lil_boosie")
@@ -840,29 +532,334 @@ View(finaldata8)
 write.csv(finaldata8, "finaldata8.csv")
 ```
 
-Regression: using all artists 
+
+
 ```{r}
-#Linking the fuccn spreadsheet and the data I have rn 
-excel <- finaldata %>%
-  select(!X4) %>%
-  rename(net = "Net Worth") %>%
-  drop_na()
-  
-  
+#Merging all data into one dataset w/all artists, lyrics, titles
 
-whole <- merge(excel, sentiments) %>%
-  select(!Artist)
+#Using rbind() to make a new .csv and changed colnames for ease of access
 
-profits <- stan_glm(data = whole, 
-                    mean ~ Year + net, 
-                    family = gaussian(), 
-                    refresh = 0)
-print(profits, digits = 5)
+complete_data <- rbind(finaldata1, finaldata2, finaldata3, finaldata4, finaldata5, finaldata6, finaldata7, finaldata8)
+write.csv(complete_data, "complete_data.csv")
+
+ 
+
+  colnames(complete_data) <- c("webpage", "artist", "title", "words")
 ```
 
-Trying to get sentiment terms out of there 
+
+
+
+
+Average number of words used per artist/song
+```{r}
+avg_words <- complete_data %>%
+  
+  #select(artist, words, title) %>%
+  group_by(artist, title) %>%
+    
+ mutate(bitch = sum(str_count(words, "bitch")),
+           hoe = sum(str_count(words, "hoe")), 
+           slut = sum(str_count(words, "slut")),
+           whore = sum(str_count(words, "whore")), 
+           tease = sum(str_count(words, "tease")), 
+           trick = sum(str_count(words, "trick")),
+           gold_digger = sum(str_count(words, "gold digger"))) %>%
+  
+  #maybe group by title here again then summarise so all the zero rows don't show up...?? Looks messy 
+  
+  mutate(sumrow = bitch + hoe + slut + whore + tease + trick + gold_digger)
+        
+
+        
+#ggplot average number of terms used by all artists per song
+
+   avg_words_model <- avg_words %>%
+     group_by(artist) %>%
+     summarise(avg_count = mean(sumrow)) %>%
+     
+   
+   ggplot(aes(x = factor(artist, level = c("grandmaster_caz", "grandmaster_melle_mel", "kurtis_blow", "kool_moe_dee", "spoonie_gee", "jimmy_spicer",  "run_dmc", "ll_cool_j", "roxanne_shante", "slick_rick", "beastie_boys", "lil_boosie",  "krsone", "too_short", "schoolly_d", "ice_cube", "chuck_d", "grand_puba", "kool_g_rap", "big_daddy_kane", "nwa", "method_man",  "scarface", "dres", "redman", "nas", "notorious_big", "2pac", "raekwon", "prodigy", "busta_rhymes", "twista", "dmx", "jayz", "2_live_crew", "big_pun", "lauryn_hill", "eminem", "ghostface_killah", "ludacris", "jadakiss", "korn", "dr_dre", "50_cent", "common", "killer_mike", "ti",  "lil_wayne", "gucci_mane", "rick_ross",  "kanye_west","drake", "nicki_minaj")), y = avg_count)) +
+  geom_col(aes(stat = "identity", position = "stack"), color = "skyblue", fill = "darkblue") +
+   labs(title = "Misogynistic Terms in Popular Rap", subtitle = "Average number of misogynistic terms used per song by the popular rappers from 1979-2016 ", x = "Artist", y = "Misogynistic Terms") +
+   theme(axis.text.x = element_text(angle = 90)) +
+     scale_x_discrete(labels = c("Grandmaster Caz", "Grandmaster Melle Mel", "Kurtis Blow", "Kool Moe Dee", "Spoonie Gee", "Jimmy Spicer",  "Run-DMC", "LL Cool J", "Roxanne Shante", "Slick Rick", "Beastie Boys", "Lil Boosie",  "KRS-One", "Too $hort", "Schoolly D", "Ice Cube", "Chuck D", "Grand Puba", "Kool G Rap", "Big Daddy Kane", "NWA", "Method Man",  "Scarface", "Dres", "Redman", "Nas", "Notorious B.I.G.", "2Pac", "Raekwon", "Prodigy", "Busta Rhymes", "Twista", "DMX", "Jay-Z", "2 Live Crew", "Big Pun", "Lauryn Hill", "Eminem", "Ghostface Killah", "Ludacris", "Jadakiss", "Korn", "D. Dre", "50 Cent", "Common", "Killer Mike", "T.I.",  "Lil Wayne", "Gucci Mane", "Rick Ross",  "Kanye West","Drake", "Nicki Minaj")) +
+     theme_clean() +
+     theme(axis.text.x = element_text(angle = 90)) 
+   
+avg_words_model
+```
+
+Total word count per artist model 
+```{r}
+total_count <- complete_data %>%
+  
+  select(artist, words, title) %>%
+  group_by(title) %>%
+
+           
+           
+  mutate(bitch = sum(str_count(words, "bitch")),
+            hoe = sum(str_count(words, "hoe")), 
+            slut = sum(str_count(words, "slut")),
+           whore = sum(str_count(words, "whore")), 
+            tease = sum(str_count(words, "tease")), 
+            trick = sum(str_count(words, "trick")),
+            gold_digger = sum(str_count(words, "gold digger"))) %>% 
+
+   group_by(artist) %>%
+   mutate(sumrow = sum(c(bitch, hoe, slut, whore, tease, trick, gold_digger))) 
+  
+
+total_count_model <- total_count%>%
+
+ggplot(aes(x = factor(artist, level = c("grandmaster_caz", "grandmaster_melle_mel", "kurtis_blow", "kool_moe_dee", "spoonie_gee", "jimmy_spicer",  "run_dmc", "ll_cool_j", "roxanne_shante", "slick_rick", "beastie_boys", "lil_boosie",  "krsone", "too_short", "schoolly_d", "ice_cube", "chuck_d", "grand_puba", "kool_g_rap", "big_daddy_kane", "nwa", "method_man",  "scarface", "dres", "redman", "nas", "notorious_big", "2pac", "raekwon", "prodigy", "busta_rhymes", "twista", "dmx", "jayz", "2_live_crew", "big_pun", "lauryn_hill", "eminem", "ghostface_killah", "ludacris", "jadakiss", "korn", "dr_dre", "50_cent", "common", "killer_mike", "ti",  "lil_wayne", "gucci_mane", "rick_ross",  "kanye_west","drake", "nicki_minaj")), y = sumrow)) +
+  geom_col( color = "darkblue", fill = "darkblue", color = "skyblue") +
+   labs(title = "Misogynistic Words used by Popular Rappers", subtitle = "From 1979-2016",  x = "Artist", y = "Total Word Count") +
+   
+     scale_x_discrete(labels = c("Grandmaster Caz", "Grandmaster Melle Mel", "Kurtis Blow", "Kool Moe Dee", "Spoonie Gee", "Jimmy Spicer",  "Run-DMC", "LL Cool J", "Roxanne Shante", "Slick Rick", "Beastie Boys", "Lil Boosie",  "KRS-One", "Too $hort", "Schoolly D", "Ice Cube", "Chuck D", "Grand Puba", "Kool G Rap", "Big Daddy Kane", "NWA", "Method Man",  "Scarface", "Dres", "Redman", "Nas", "Notorious B.I.G.", "2Pac", "Raekwon", "Prodigy", "Busta Rhymes", "Twista", "DMX", "Jay-Z", "2 Live Crew", "Big Pun", "Lauryn Hill", "Eminem", "Ghostface Killah", "Ludacris", "Jadakiss", "Korn", "D. Dre", "50 Cent", "Common", "Killer Mike", "T.I.",  "Lil Wayne", "Gucci Mane", "Rick Ross",  "Kanye West","Drake", "Nicki Minaj")) +
+  theme_clean() +
+theme(axis.text.x = element_text(angle = 90)) 
+        
+total_count_model
+        
+```
+
+
+
+
+
+
+
+
+"grandmaster_caz", "grandmaster_melle_mel", "kurtis_blow", "kool_moe_dee", "spoonie_gee", "jimmy_spicer",  "run_dmc", "ll_cool_j", "roxanne_shante", "slick_rick", "beastie_boys", "lil_boosie",  "krsone", "too_short", "schoolly_d", "ice_cube", "chuck_d", "grand_puba", "kool_g_rap", "big_daddy_kane", "nwa", "method_man",  "scarface", "dres", "redman", "nas", "notorious_big", "2pac", "raekwon", "prodigy", "busta_rhymes", "twista", "dmx", "jayz", "2_live_crew", "big_pun", "lauryn_hill", "eminem", "ghostface_killah", "ludacris", "jadakiss", "korn", "dr_dre", "50_cent", "common", "killer_mike", "ti",  "lil_wayne", "gucci_mane", "rick_ross",  "kanye_west","drake", "nicki_minaj"    
+      
+
+Song Sentiment distribution for an individual artist (Too $hort)
+```{r}
+#Sentiments for too short (total)
+# too_short <- complete_data %>%
+#   filter(Artist == "too_short") %>%
+#   select(words, Artist, titles)
+# 
+#  too_short_sentiments <- sentiment_by(too_short$words,
+#  averaging.function = sentimentr::average_downweighted_zero) %>%
+#     mutate(total = sum(ave_sentiment)) 
+ 
+ too_short_sentiments <- complete_data %>%
+   filter(artist == "too_short") %>%
+  select(words, artist, title) %>%
+   group_by(title) %>%
+   get_sentences() %>%
+   
+ 
+sentiment_by(too_short_sentiments$words, by = "title",  
+ averaging.function = sentimentr::average_mean) %>%
+   group_by(title)
+
+#modeling one artists sentiments each song 
+too_short_sentiments %>%
+  select(title, ave_sentiment) %>%
+  group_by(title) %>%
+  summarise(mean = mean(ave_sentiment)) %>%
+
+
+  
+ 
+ ggplot(aes(x = reorder(title, desc(mean)), y = mean)) +
+   geom_col(color = "darkblue", fill = "steelblue") +
+  
+  labs(title = "Too $hort Sentiment Ratings", subtitle = "Sentiment Ratings of Too $hort songs", y = "Average Sentiment Rating for each Too $hort Song", x = "Songs") +
+  theme_clean() +
+theme(axis.text.x = element_blank()) 
+
+too_short_sentiments
+  
+  
+```
+
+
+
+
+whole dataset sentiments (averge sentiment rating for each artist)
+```{r}
+total_sentiments <- complete_data %>%
+   
+  select(words, artist, title) %>%
+   group_by(artist, title) %>%
+   get_sentences() %>%
+   
+ 
+sentiment_by(total_sentiments$words, by = c("artist", "title"),  
+ averaging.function = sentimentr::average_mean) 
+
+total_sentiments <- total_sentiments%>%
+  rename(song_sentiment = ave_sentiment)
+
+
+
+total_avg_sentiments <- total_sentiments %>%
+  group_by(artist) %>%
+  summarise(avg_song_sentiment = sum(song_sentiment)) 
+  
+total_avg_sentiments_model <- total_avg_sentiments %>%
+ ggplot(aes(x = factor(artist, level = c("grandmaster_caz", "grandmaster_melle_mel", "kurtis_blow", "kool_moe_dee", "spoonie_gee", "jimmy_spicer",  "run_dmc", "ll_cool_j", "roxanne_shante", "slick_rick", "beastie_boys",  "krsone", "too_short", "schoolly_d", "ice_cube", "chuck_d", "grand_puba", "kool_g_rap", "big_daddy_kane", "nwa", "method_man",  "scarface", "dres", "redman", "nas", "notorious_big", "2pac", "raekwon", "prodigy", "busta_rhymes", "twista", "dmx", "jayz", "big_pun", "lauryn_hill", "eminem", "ghostface_killah", "ludacris", "jadakiss", "dr_dre", "50_cent", "common", "ti",  "lil_wayne", "gucci_mane", "rick_ross",  "kanye_west","drake", "nicki_minaj")), y = avg_song_sentiment)) +
+   geom_col(fill = "steelblue", color = "darkblue") +
+  
+  scale_x_discrete(labels = c("Grandmaster Caz", "Grandmaster Melle Mel", "Kurtis Blow", "Kool Moe Dee", "Spoonie Gee", "Jimmy Spicer",  "Run-DMC", "LL Cool J", "Roxanne Shante", "Slick Rick", "Beastie Boys", "Lil Boosie",  "KRS-One", "Too $hort", "Schoolly D", "Ice Cube", "Chuck D", "Grand Puba", "Kool G Rap", "Big Daddy Kane", "NWA", "Method Man",  "Scarface", "Dres", "Redman", "Nas", "Notorious B.I.G.", "2Pac", "Raekwon", "Prodigy", "Busta Rhymes", "Twista", "DMX", "Jay-Z", "2 Live Crew", "Big Pun", "Lauryn Hill", "Eminem", "Ghostface Killah", "Ludacris", "Jadakiss", "Korn", "D. Dre", "50 Cent", "Common", "Killer Mike", "T.I.",  "Lil Wayne", "Gucci Mane", "Rick Ross",  "Kanye West","Drake", "Nicki Minaj")) +
+  labs(title = "Average Sentiment Ratings for Popular Rappers", subtitle = "From 1979-2016", x = "Artist", y = "Average Sentiment Rating") +
+  theme_clean() +
+  theme(axis.text.x = element_text(angle = 90)) 
+  
+   
+#average sentiment for all songs per artist over the years  
+total_avg_sentiments_model
+  
+```
+Tryna look at sentiment and words together so making sentiment data not numerical but like negative or positive only then if its negative/positive/neutral give it a plus/minus point and see where that gets you 
+
+  
+
+Tryna look at sentiment and words together so making sentiment data not numerical but like negative or postitive only then if its negative/positive/neutral give it a plus/minus point and see where that gets you 
 
 ```{r}
+# sentiments2 <- complete_data %>%
+#    select(title, artist, words) %>%
+#    group_by(artist) %>%
+#    get_sentences() %>%
+#    
+#  
+# sentiment_by(sentiments2$words, by = c("title", "artist"),  
+#  averaging.function = sentimentr::average_mean) %>%
+#    group_by(artist)
+
+new_scores <- merge(total_sentiments, total_count) %>%
+
+
+  mutate(sentiment_rating = case_when((song_sentiment >= 0 & sumrow <= 0) ~ "positive", 
+                        # (ave_sentiment == 0) ~ "neutral", 
+                         (song_sentiment <= 0 & sumrow >= 0) ~ "negative", 
+                        TRUE ~ "neutral")) %>%
+  
+  mutate(sentiment_score = case_when(sentiment_rating == "positive" ~ -1, 
+                   sentiment_rating == "neutral" ~ 0, 
+                   sentiment_rating == "negative" ~ 1)) %>%
+  group_by(artist) %>% 
+    mutate(score = sum(sentiment_score))
+  
+ new_scores_model <- new_scores %>%
+
+ggplot(aes(x = factor(artist, level = c("grandmaster_caz", "grandmaster_melle_mel", "kurtis_blow", "kool_moe_dee", "spoonie_gee", "jimmy_spicer",  "run_dmc", "ll_cool_j", "roxanne_shante", "slick_rick", "beastie_boys",  "krsone", "too_short", "schoolly_d", "ice_cube", "chuck_d", "grand_puba", "kool_g_rap", "big_daddy_kane", "nwa", "method_man",  "scarface", "dres", "redman", "nas", "notorious_big", "2pac", "raekwon", "prodigy", "busta_rhymes", "twista", "dmx", "jayz", "big_pun", "lauryn_hill", "eminem", "ghostface_killah", "ludacris", "jadakiss", "dr_dre", "50_cent", "common", "ti",  "lil_wayne", "gucci_mane", "rick_ross",  "kanye_west","drake", "nicki_minaj")), y = score)) +
+ # geom_line(aes(group = 1)) +
+  geom_point() +
+  geom_line(aes(group = 1), color = "steelblue") +
+  
+  scale_x_discrete(labels = c("Grandmaster Caz", "Grandmaster Melle Mel", "Kurtis Blow", "Kool Moe Dee", "Spoonie Gee", "Jimmy Spicer",  "Run-DMC", "LL Cool J", "Roxanne Shante", "Slick Rick", "Beastie Boys", "Lil Boosie",  "KRS-One", "Too $hort", "Schoolly D", "Ice Cube", "Chuck D", "Grand Puba", "Kool G Rap", "Big Daddy Kane", "NWA", "Method Man",  "Scarface", "Dres", "Redman", "Nas", "Notorious B.I.G.", "2Pac", "Raekwon", "Prodigy", "Busta Rhymes", "Twista", "DMX", "Jay-Z", "2 Live Crew", "Big Pun", "Lauryn Hill", "Eminem", "Ghostface Killah", "Ludacris", "Jadakiss", "Korn", "D. Dre", "50 Cent", "Common", "Killer Mike", "T.I.",  "Lil Wayne", "Gucci Mane", "Rick Ross",  "Kanye West","Drake", "Nicki Minaj")) +
+  theme(axis.text.x = element_text(angle = 90)) %>%
+  labs(title = "Negative Sentiment Ratings", subtitle = "For Artists between 1979-2016", x = "Artist", y = "Negative Sentiment Rating") +
+ 
+  theme_clean() +
+  theme(axis.text.x = element_text(angle = 90)) 
+
+new_scores_model
+
+
+```
+^^^Sentiment over the years model 2??? Compiles words and sentiments 
+
+
+```{r}
+
+ new_scores_model2 <- new_scores %>%
+
+ggplot(aes(x = factor(artist, level = c("grandmaster_caz", "grandmaster_melle_mel", "kurtis_blow", "kool_moe_dee", "spoonie_gee", "jimmy_spicer",  "run_dmc", "ll_cool_j", "roxanne_shante", "slick_rick", "beastie_boys",  "krsone", "too_short", "schoolly_d", "ice_cube", "chuck_d", "grand_puba", "kool_g_rap", "big_daddy_kane", "nwa", "method_man",  "scarface", "dres", "redman", "nas", "notorious_big", "2pac", "raekwon", "prodigy", "busta_rhymes", "twista", "dmx", "jayz", "big_pun", "lauryn_hill", "eminem", "ghostface_killah", "ludacris", "jadakiss", "dr_dre", "50_cent", "common", "ti",  "lil_wayne", "gucci_mane", "rick_ross",  "kanye_west","drake", "nicki_minaj")), y = score)) +
+
+  geom_col(color = "darkblue", fill = "darkblue") +
+ 
+  
+  scale_x_discrete(labels = c("Grandmaster Caz", "Grandmaster Melle Mel", "Kurtis Blow", "Kool Moe Dee", "Spoonie Gee", "Jimmy Spicer",  "Run-DMC", "LL Cool J", "Roxanne Shante", "Slick Rick", "Beastie Boys", "Lil Boosie",  "KRS-One", "Too $hort", "Schoolly D", "Ice Cube", "Chuck D", "Grand Puba", "Kool G Rap", "Big Daddy Kane", "NWA", "Method Man",  "Scarface", "Dres", "Redman", "Nas", "Notorious B.I.G.", "2Pac", "Raekwon", "Prodigy", "Busta Rhymes", "Twista", "DMX", "Jay-Z", "2 Live Crew", "Big Pun", "Lauryn Hill", "Eminem", "Ghostface Killah", "Ludacris", "Jadakiss", "Korn", "D. Dre", "50 Cent", "Common", "Killer Mike", "T.I.",  "Lil Wayne", "Gucci Mane", "Rick Ross",  "Kanye West","Drake", "Nicki Minaj")) +
+  theme(axis.text.x = element_text(angle = 90)) %>%
+  labs(title = "Misogynistic Sentiment Ratings", subtitle = "For Rappers between 1979-2016", x = "Artist", y = "Rating") +
+ 
+  theme_clean() +
+  theme(axis.text.x = element_text(angle = 90)) 
+
+new_scores_model2
+
+```
+
+
+
+
+
+
+
+
+
+`
+ 
+
+ "grandmaster_caz", "kool_moe_dee", "spoonie_gee", "jimmy_spicer", "roxanne_shante", "beastie_boys", "krsone",   4
+ 
+"schoolly_d", "chuck_d", "big_daddy_kane", "kool_g_rap", "grand_puba", "scarface", "dr_dre", "dres",    5
+
+"method_man", "raekwon", "prodigy", "busta_rhymes", "twista", "big_pun", "lauryn_hill", "ghostface_killah",    6
+
+"ludacris", "jadakiss", "common", "gucci_mane", "rick_ross",   7
+
+"killer_mike", "korn", "2_live_crew", "lil_boosie"    8
+
+
+
+Regression using all artists...completely insignificant  
+```{r}
+
+
+
+#adding spreadsheet with year and networth from excel to data I have rn 
+
+excel <- (finaldata) %>%
+  select(!X4) %>%
+  rename(net = "Net Worth") %>%
+  rename(artist = "Artist")
+
+
+  
+#Dataset containing mutated misogyny ratings, artists, titles, year and net worth
+
+big <- merge(excel, new_scores)
+
+
+#Stan_glm() to find something that is not there
+
+fit_big <- stan_glm(data = big, 
+
+#Looking at the year's effect on misogyny score
+
+                    score ~  Year, 
+                    family = gaussian(), 
+                    refresh = 0)
+print(fit_big, digits = 5)
+```
+
+Linear regression??
+```{r}
+regression_model <- ggplot(big, aes(x = Year, y = score)) +
+  geom_point(color = "steelblue", alpha = .1, size = 1.5, position = position_jitter(width = 1.5, height = 1.5)) +
+  labs(title = "Misogynistic Sentiment Rating and Year", x = "Year", y = "Rating") #+
+  #geom_abline(intercept = -1017.40384, slope =   0.56448  , color = "darkblue")
+  #This is just not cute but uses the coefficients from stan_glm() fit 
+  
+
+regression_model
+  
+ 
+```
+
+Trying to get sentiment terms out of there...looking for profanity as a measure 
+
+```{r}
+
 profane <- complete_data %>%
    #select(titles, Artist, words) %>%
    group_by(artist, title) %>%
@@ -890,9 +887,33 @@ extract_sentiment_terms(pleasework$words,
                         hyphen = "")
 ```
 
+```{r}
+write.csv(big, "big.csv")
+
+```
 
 ```{r}
+artist_sentiments_model <- total_sentiments %>%
+  filter(artist == "too_short") %>%
+  group_by(title)
 
+artist_sentiments_model %>%
+   ggplot(aes(x = reorder(title, desc(song_sentiment)), y = song_sentiment)) +
+   geom_col(color = "darkblue", fill = "steelblue") +
+  
+  labs(title = "Sentiment Ratings by Song", y = "Sentiment Rating", x = "Songs") +
+  theme_clean() +
+  theme(axis.text.x = element_blank()) 
+
+
+  artist_sentiments_model
+  
+```
+```{r}
+theme_base()
+theme_bw()
+theme_calc()
+theme_foundation()
 ```
 
 
