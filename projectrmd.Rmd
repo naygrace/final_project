@@ -17,6 +17,9 @@ library(sentimentr)
 library(glue)
 library(tidytext)
 library(rstanarm)
+library(broom.mixed)
+library(gtsummary)
+library(gt)
 ```
 
 Artist  g1
@@ -716,26 +719,12 @@ total_avg_sentiments_model <- total_avg_sentiments %>%
 total_avg_sentiments_model
   
 ```
-Tryna look at sentiment and words together so making sentiment data not numerical but like negative or positive only then if its negative/positive/neutral give it a plus/minus point and see where that gets you 
-
+Sentiment alone is a very poor predictor of misogynistic sentiment or even sentiment in general...
   
 
-Tryna look at sentiment and words together so making sentiment data not numerical but like negative or postitive only then if its negative/positive/neutral give it a plus/minus point and see where that gets you 
-
+Trying to find a way to show sentiment as it interacts with word usage 
 ```{r}
-# sentiments2 <- complete_data %>%
-#    select(title, artist, words) %>%
-#    group_by(artist) %>%
-#    get_sentences() %>%
-#    
-#  
-# sentiment_by(sentiments2$words, by = c("title", "artist"),  
-#  averaging.function = sentimentr::average_mean) %>%
-#    group_by(artist)
-
 new_scores <- merge(total_sentiments, total_count) %>%
-
-
   mutate(sentiment_rating = case_when((song_sentiment >= 0 & sumrow <= 0) ~ "positive", 
                         # (ave_sentiment == 0) ~ "neutral", 
                          (song_sentiment <= 0 & sumrow >= 0) ~ "negative", 
@@ -748,11 +737,10 @@ new_scores <- merge(total_sentiments, total_count) %>%
     mutate(score = sum(sentiment_score))
   
  new_scores_model <- new_scores %>%
-
 ggplot(aes(x = factor(artist, level = c("grandmaster_caz", "grandmaster_melle_mel", "kurtis_blow", "kool_moe_dee", "spoonie_gee", "jimmy_spicer",  "run_dmc", "ll_cool_j", "roxanne_shante", "slick_rick", "beastie_boys",  "krsone", "too_short", "schoolly_d", "ice_cube", "chuck_d", "grand_puba", "kool_g_rap", "big_daddy_kane", "nwa", "method_man",  "scarface", "dres", "redman", "nas", "notorious_big", "2pac", "raekwon", "prodigy", "busta_rhymes", "twista", "dmx", "jayz", "big_pun", "lauryn_hill", "eminem", "ghostface_killah", "ludacris", "jadakiss", "dr_dre", "50_cent", "common", "ti",  "lil_wayne", "gucci_mane", "rick_ross",  "kanye_west","drake", "nicki_minaj")), y = score)) +
  # geom_line(aes(group = 1)) +
-  geom_point() +
-  geom_line(aes(group = 1), color = "steelblue") +
+  #geom_point() +
+  geom_col(color = "steelblue", fill = "darkblue") +
   
   scale_x_discrete(labels = c("Grandmaster Caz", "Grandmaster Melle Mel", "Kurtis Blow", "Kool Moe Dee", "Spoonie Gee", "Jimmy Spicer",  "Run-DMC", "LL Cool J", "Roxanne Shante", "Slick Rick", "Beastie Boys", "Lil Boosie",  "KRS-One", "Too $hort", "Schoolly D", "Ice Cube", "Chuck D", "Grand Puba", "Kool G Rap", "Big Daddy Kane", "NWA", "Method Man",  "Scarface", "Dres", "Redman", "Nas", "Notorious B.I.G.", "2Pac", "Raekwon", "Prodigy", "Busta Rhymes", "Twista", "DMX", "Jay-Z", "2 Live Crew", "Big Pun", "Lauryn Hill", "Eminem", "Ghostface Killah", "Ludacris", "Jadakiss", "Korn", "D. Dre", "50 Cent", "Common", "Killer Mike", "T.I.",  "Lil Wayne", "Gucci Mane", "Rick Ross",  "Kanye West","Drake", "Nicki Minaj")) +
   theme(axis.text.x = element_text(angle = 90)) %>%
@@ -760,14 +748,13 @@ ggplot(aes(x = factor(artist, level = c("grandmaster_caz", "grandmaster_melle_me
  
   theme_clean() +
   theme(axis.text.x = element_text(angle = 90)) 
-
 new_scores_model
-
-
 ```
-^^^Sentiment over the years model 2??? Compiles words and sentiments 
 
 
+
+
+Word count and sentiment 
 ```{r}
 
  new_scores %>%
@@ -810,11 +797,8 @@ new_scores_model2
 
 
 
-Regression using all artists...completely insignificant  
+Regression using all artists... 
 ```{r}
-
-
-
 #adding spreadsheet with year and networth from excel to data I have rn 
 
 excel <- (finaldata) %>%
@@ -835,10 +819,21 @@ fit_big <- stan_glm(data = big,
 
 #Looking at the year's effect on misogyny score
 
-                    sentiment_score ~  Year, 
+                    score ~  Year, 
                     family = gaussian(), 
                     refresh = 0)
 print(fit_big, digits = 5)
+```
+
+Regression Model 
+```{r}
+regression <- tbl_regression(fit_big, intercept = TRUE) %>%
+   as_gt()%>%
+  tab_header(title = "Regression of Misogynistic Sentiment Ratings", 
+             subtitle = "The Effect of Year on Misogynistic Sentiment in Rap Music") %>%
+  theme_gtsummary_continuous2()
+
+regression
 ```
 
 Linear regression??
@@ -855,36 +850,8 @@ regression_model
  
 ```
 
-Trying to get sentiment terms out of there...looking for profanity as a measure 
-
-```{r}
-
-profane <- complete_data %>%
-   #select(titles, Artist, words) %>%
-   group_by(artist, title) %>%
-   get_sentences() %>%
-   
- 
-profanity_by(profane$words, by = c("title", "artist"),  
- averaging.function = sentimentr::average_mean) %>%
-   group_by(artist) %>%
-  summarise(mean = mean(ave_profanity))
-
-```
 
 
-
-```{r}
-pleasework <- complete_data %>%
-   #select(titles, Artist, words) %>%
-   group_by(artist, title) %>%
-   get_sentences() %>%
-   
- 
-extract_sentiment_terms(pleasework$words, 
-                        polarity_dt = lexicon::hash_sentiment_jockers_rinker, 
-                        hyphen = "")
-```
 
 ```{r}
 write.csv(big, "big.csv")
@@ -892,11 +859,11 @@ write.csv(big, "big.csv")
 ```
 
 ```{r}
-artist_sentiments_model <- total_sentiments %>%
+ total_sentiments %>%
   filter(artist == "too_short") %>%
-  group_by(title)
+  group_by(title) %>%
 
-artist_sentiments_model %>%
+#Here is the code I'll use for each artists' sentiment ratings (interactive portion)
    ggplot(aes(x = reorder(title, desc(song_sentiment)), y = song_sentiment)) +
    geom_col(color = "darkblue", fill = "steelblue") +
   
@@ -905,14 +872,8 @@ artist_sentiments_model %>%
   theme(axis.text.x = element_blank()) 
 
 
-  artist_sentiments_model
   
-```
-```{r}
-theme_base()
-theme_bw()
-theme_calc()
-theme_foundation()
+  
 ```
 
 
