@@ -801,16 +801,16 @@ Regression using all artists...
 ```{r}
 #adding spreadsheet with year and networth from excel to data I have rn 
 
-excel <- (finaldata) %>%
-  select(!X4) %>%
-  rename(net = "Net Worth") %>%
-  rename(artist = "Artist")
+# excel <- (read_csv("misogyny_in_rap/excel_data/excel2.csv")) %>%
+#   select(!X4) %>%
+#   rename(net = "Net Worth") %>%
+#   rename(artist = "Artist")
 
 
   
 #Dataset containing mutated misogyny ratings, artists, titles, year and net worth
 
-big <- merge(excel, new_scores)
+# big <- merge(excel, new_scores)
 
 
 #Stan_glm() to find something that is not there
