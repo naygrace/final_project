@@ -744,7 +744,7 @@ ggplot(aes(x = factor(artist, level = c("grandmaster_caz", "grandmaster_melle_me
   
   scale_x_discrete(labels = c("Grandmaster Caz", "Grandmaster Melle Mel", "Kurtis Blow", "Kool Moe Dee", "Spoonie Gee", "Jimmy Spicer",  "Run-DMC", "LL Cool J", "Roxanne Shante", "Slick Rick", "Beastie Boys", "Lil Boosie",  "KRS-One", "Too $hort", "Schoolly D", "Ice Cube", "Chuck D", "Grand Puba", "Kool G Rap", "Big Daddy Kane", "NWA", "Method Man",  "Scarface", "Dres", "Redman", "Nas", "Notorious B.I.G.", "2Pac", "Raekwon", "Prodigy", "Busta Rhymes", "Twista", "DMX", "Jay-Z", "2 Live Crew", "Big Pun", "Lauryn Hill", "Eminem", "Ghostface Killah", "Ludacris", "Jadakiss", "Korn", "D. Dre", "50 Cent", "Common", "Killer Mike", "T.I.",  "Lil Wayne", "Gucci Mane", "Rick Ross",  "Kanye West","Drake", "Nicki Minaj")) +
   theme(axis.text.x = element_text(angle = 90)) %>%
-  labs(title = "Negative Sentiment Ratings", subtitle = "For Artists between 1979-2016", x = "Artist", y = "Negative Sentiment Rating") +
+  labs(title = "Misogynistic Sentiment Ratings", subtitle = "For Artists between 1979-2016", x = "Artist", y = "Sentiment Rating") +
  
   theme_clean() +
   theme(axis.text.x = element_text(angle = 90)) 
@@ -833,7 +833,8 @@ regression <- tbl_regression(fit_big, intercept = TRUE) %>%
              subtitle = "The Effect of Year on Misogynistic Sentiment in Rap Music") %>%
   theme_gtsummary_continuous2()
 
-regression
+saveRDS(regression, file = "misogyny_in_rap")
+saveRDS(new_scores_model, file = "misogyny_in_rap")
 ```
 
 Linear regression??

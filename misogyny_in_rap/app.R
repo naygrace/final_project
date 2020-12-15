@@ -54,7 +54,10 @@ ui <- navbarPage(theme = shinytheme("cosmo"),
      tabPanel("Sentiment Analysis",
               fluidPage(
                   titlePanel("Average Misogynistic Sentiment Rating"),
-                  
+                  #  sidebarLayout(
+                  #      sidebarPanel(),
+                  #      mainPanel(
+                  # img(src = "regression_mod.png"),
                   plotOutput("plot6"), 
                   
                   h4("'Misogynistic Sentiment Rating' calculated using the sentiment rating and misogynistic word count for each song. (With a rating of zero meaning low misogynistic sentiment) ")),
@@ -94,13 +97,18 @@ ui <- navbarPage(theme = shinytheme("cosmo"),
     tabPanel("Regression Model", 
              fluidPage(
                  titlePanel("Year and Misogynistic Sentiment Rating"), 
-                 plotOutput("plot5"), 
+                #   sidebarLayout(
+                #       sidebarPanel(),
+                #       mainPanel(
+                # img(src = sentiment_rate_mod.png),
+                readRDS(file = "regression"),
+                   #plotOutput("plot5"), 
                  h3("This model represents the prevalence of misogynistic sentiments in rap as a function of the year the respective artist was popular. There is a very weak positive coorelation here, but a more thorough analysis of the data would be necessary to understand potential correlation between nuanced misogynistic sentiment and era. ") 
                  )))
 
 #Defining all output plots..created here and in .rmd
 
-server = function(input, output) {
+server <- function(input, output) {
     
     
     
