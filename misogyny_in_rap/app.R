@@ -57,7 +57,7 @@ ui <- navbarPage(theme = shinytheme("cosmo"),
                   #  sidebarLayout(
                   #      sidebarPanel(),
                   #      mainPanel(
-                  # img(src = "regression_mod.png"),
+                   #img(src = "regression_mod.png"),
                   plotOutput("plot6"), 
                   
                   h4("'Misogynistic Sentiment Rating' calculated using the sentiment rating and misogynistic word count for each song. (With a rating of zero meaning low misogynistic sentiment) ")),
@@ -100,9 +100,9 @@ ui <- navbarPage(theme = shinytheme("cosmo"),
                 #   sidebarLayout(
                 #       sidebarPanel(),
                 #       mainPanel(
-                # img(src = sentiment_rate_mod.png),
-                readRDS(file = "regression"),
-                   #plotOutput("plot5"), 
+                 #img(src = sentiment_rate_mod.png),
+               
+                   plotOutput("plot5"), 
                  h3("This model represents the prevalence of misogynistic sentiments in rap as a function of the year the respective artist was popular. There is a very weak positive coorelation here, but a more thorough analysis of the data would be necessary to understand potential correlation between nuanced misogynistic sentiment and era. ") 
                  )))
 
